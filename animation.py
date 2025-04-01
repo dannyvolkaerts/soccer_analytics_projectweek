@@ -32,11 +32,11 @@ conn = psycopg2.connect(
 )
 
 ballquery="""
-SELECT pt.frame_id, pt.timestamp, pt.player_id, pt.x, pt.y, p.team_id
+SELECT pt.period_id, pt.frame_id, pt.timestamp, pt.x, pt.y, pt.player_id, p.team_id
 FROM player_tracking pt
 JOIN players p ON pt.player_id = p.player_id
 JOIN teams t ON p.team_id = t.team_id
-WHERE pt.game_id = '5uts2s7fl98clqz8uymaazehg' AND p.player_id = 'ball'
+WHERE pt.game_id = '5uts2s7fl98clqz8uymaazehg' AND p.player_id = 'ball' AND pt.period_id = 1
 ORDER BY timestamp;
 """
 # Differentiating teams logic
@@ -79,26 +79,29 @@ ball, = ax.plot([], [], ms=6, markerfacecolor='w', zorder=3, **marker_kwargs)
 away, = ax.plot([], [], ms=10, markerfacecolor='#b94b75', **marker_kwargs)  # red/maroon
 home, = ax.plot([], [], ms=10, markerfacecolor='#7f63b8', **marker_kwargs)  # purple
 
-our_number = 1722026700000
+our_number = 1722798900000
 # animation function
 def animate(i):
     """ Function to animate the data. Each frame it sets the data for the players and the ball."""
     # set the ball data with the x and y positions for the ith frame
-    ball.set_data(df_ball.iloc[i, [3]], df_ball.iloc[i, [4]])
+    ball.set_data(df_ball.iloc[i, [3]]/100, df_ball.iloc[i, [4]]/100)
+    #print(df_ball.iloc[i, [3]], df_ball.iloc[i, [4]])
+    print(ball.get_data())
     # get the frame id for the ith frame
-    print(i)
+    #print(i)
     frame = df_ball.iloc[i, 1]
+    #print(frame)
 
     # set the player data using the frame id
-    away.set_data(df_away.loc[df_away.frame_id - our_number == frame, 'x'],
-                  df_away.loc[df_away.frame_id - our_number == frame, 'y'])
-    home.set_data(df_home.loc[df_home.frame_id - our_number == frame, 'x'],
-                  df_home.loc[df_home.frame_id - our_number == frame, 'y'])
+    away.set_data(df_away.loc[df_away.frame_id == frame, 'x']/100,
+                  df_away.loc[df_away.frame_id == frame, 'y']/100)
+    home.set_data(df_home.loc[df_home.frame_id == frame, 'x']/100,
+                  df_home.loc[df_home.frame_id == frame, 'y']/100)
     return ball, away, home
 
 
 # call the animator, animate so 25 frames per second
-anim = animation.FuncAnimation(fig, animate, frames=len(df_ball), interval=1, blit=True)
+anim = animation.FuncAnimation(fig, animate, frames=1000, interval=1000, blit=True)
 plt.show()
 
 # note th<at its hard to get the ffmpeg requirements right.

@@ -115,6 +115,7 @@ def animate(i):
     """ Function to animate the data. Each frame it sets the data for the players and the ball."""
     # set the ball data with the x and y positions for the ith frame
     ball.set_data(df_ball.iloc[i, [3]], df_ball.iloc[i, [4]])
+    print(df_ball.iloc[i, [3]], df_ball.iloc[i, [4]])
     # get the frame id for the ith frame
     frame = df_ball.iloc[i, 1]
     # set the player data using the frame id
