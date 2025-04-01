@@ -5,7 +5,7 @@ import dotenv
 import os
 from matplotlib import animation
 from matplotlib import pyplot as plt
-
+from scipy.interpolate import interp1d
 from mplsoccer import Pitch
 
 
@@ -85,13 +85,10 @@ def animate(i):
     """ Function to animate the data. Each frame it sets the data for the players and the ball."""
     # set the ball data with the x and y positions for the ith frame
     ball.set_data(df_ball.iloc[i, [3]]/100, df_ball.iloc[i, [4]]/100)
-    #print(df_ball.iloc[i, [3]], df_ball.iloc[i, [4]])
-    print(ball.get_data())
     # get the frame id for the ith frame
     #print(i)
     frame = df_ball.iloc[i, 1]
     #print(frame)
-
     # set the player data using the frame id
     away.set_data(df_away.loc[df_away.frame_id == frame, 'x']/100,
                   df_away.loc[df_away.frame_id == frame, 'y']/100)
@@ -101,13 +98,13 @@ def animate(i):
 
 
 # call the animator, animate so 25 frames per second
-anim = animation.FuncAnimation(fig, animate, frames=1000, interval=1000, blit=True)
+anim = animation.FuncAnimation(fig, animate,frames=10,interval=40, blit=True,repeat=False)
 plt.show()
 
 # note th<at its hard to get the ffmpeg requirements right.
 # I installed from conda-forge: see the environment.yml file in the docs folder
 # how to save animation - commented out for example
-# anim.save('example.mp4', dpi=150, fps=25,
+#anim.save('example.mp4', dpi=150, fps=25,
 #          extra_args=['-vcodec', 'libx264'],
 #          savefig_kwargs={'pad_inches':0, 'facecolor':'#457E29'})
 
