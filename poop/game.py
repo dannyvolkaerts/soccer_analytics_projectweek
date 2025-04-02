@@ -53,9 +53,13 @@ def draw_frame(frame_idx, df_ball_interp, home_frames, home_positions, away_fram
         canvas = agg.FigureCanvasAgg(fig)
         canvas.draw()
         renderer = canvas.get_renderer()
-        raw_data = renderer.tostring_rgb()
+        
+        raw_data = renderer.tostring_argb()
         canvas_width, canvas_height = canvas.get_width_height()
-        return pygame.image.fromstring(raw_data, (canvas_width, canvas_height), "RGB")
+
+        argb_array = np.frombuffer(raw_data, dtype=np.uint8).reshape(canvas_height, canvas_width, 4)
+        rgb_array = argb_array[:, :, 1:]
+        return pygame.image.frombuffer(rgb_array.tobytes(), (canvas_width, canvas_height), "RGB")
     except Exception as e:
         print(f"Frame rendering error: {e}")
         # Return a blank surface if there's an error
