@@ -7,8 +7,7 @@ from matplotlib import animation
 from matplotlib import pyplot as plt
 from scipy.interpolate import interp1d
 from mplsoccer import Pitch
-
-
+import time
 
 dotenv.load_dotenv()
 
@@ -82,23 +81,23 @@ home, = ax.plot([], [], ms=10, markerfacecolor='#7f63b8', **marker_kwargs)  # pu
 our_number = 1722798900000
 # animation function
 def animate(i):
-    """ Function to animate the data. Each frame it sets the data for the players and the ball."""
-    # set the ball data with the x and y positions for the ith frame
+    # Get the frame id for the ith frame
+    frame = df_ball.loc[i, 'frame_id']
+
+    print('Current:',df_ball.loc[i, 'x'])
+    print('Next:',df_ball.loc[i+1, 'x'])
     ball.set_data(df_ball.iloc[i, [3]]/100, df_ball.iloc[i, [4]]/100)
-    # get the frame id for the ith frame
-    #print(i)
-    frame = df_ball.iloc[i, 1]
-    #print(frame)
     # set the player data using the frame id
     away.set_data(df_away.loc[df_away.frame_id == frame, 'x']/100,
                   df_away.loc[df_away.frame_id == frame, 'y']/100)
     home.set_data(df_home.loc[df_home.frame_id == frame, 'x']/100,
                   df_home.loc[df_home.frame_id == frame, 'y']/100)
+    print(ball,away,home)
     return ball, away, home
 
 
 # call the animator, animate so 25 frames per second
-anim = animation.FuncAnimation(fig, animate,frames=10,interval=40, blit=True,repeat=False)
+anim = animation.FuncAnimation(fig, animate,interval=1000, blit=True,repeat=False)
 plt.show()
 
 # note th<at its hard to get the ffmpeg requirements right.
