@@ -51,7 +51,7 @@ JOIN teams t ON p.team_id = t.team_id
 WHERE pt.game_id = '5uts2s7fl98clqz8uymaazehg' AND p.player_id != 'ball' AND p.team_id = %s
 ORDER BY timestamp;
 """
-SELECT_BY_MATCH_ID = """"
+SELECT_BY_MATCH_ID = """
 SELECT 
     m.match_id, m.match_date, m.home_score, m.away_score, m.home_team_id,
     t1.team_name AS home_team, m.away_team_id,
@@ -64,7 +64,21 @@ ORDER BY m.match_id
 ;
 """
 
-LIST_OF_MATCHES = """
+LIST_OF_ALL_MATCHES = """
+SELECT 
+    m.match_id,
+    m.home_score, 
+    m.away_score, 
+    m.home_team_id,
+    m.away_team_id,
+    CONCAT(t1.team_name, ' vs ', t2.team_name) AS matchup
+FROM matches m
+JOIN teams t1 ON m.home_team_id = t1.team_id
+JOIN teams t2 ON m.away_team_id = t2.team_id
+ORDER BY m.match_id;
+"""
+
+GET_SPECIFIC_MATCH = """
 SELECT 
     m.match_id,
     m.home_score, 
@@ -78,15 +92,35 @@ JOIN teams t2 ON m.away_team_id = t2.team_id
 WHERE m.match_id = '%s'
 ORDER BY m.match_id;
 """
-# Load data from the database
-def load_data():
+# Function to get all available matches
+def get_all_matches():
     conn = get_connection()
-    team_ids_df = pd.read_sql_query(TEAM_QUERY, conn)
-    team_ids = team_ids_df['team_id'].tolist()
+    matches_df = pd.read_sql_query(LIST_OF_ALL_MATCHES, conn)
+    conn.close()
+    return matches_df
 
-    df_ball = pd.read_sql_query(BALL_QUERY, conn)
-    df_home = pd.read_sql_query(TEAM_QUERIES, conn, params=(team_ids[0],))
-    df_away = pd.read_sql_query(TEAM_QUERIES, conn, params=(team_ids[1],))
-    specific_match = pd.read_sql_query(SELECT_BY_MATCH_ID, conn, params=(team_ids[0],))
+# Modify the load_data function to accept a match_id parameter
+def load_data(match_id='5uts2s7fl98clqz8uymaazehg'):  # Default to your current match
+    conn = get_connection()
+    
+    # Update all queries to use the provided match_id
+    ball_query = BALL_QUERY.replace("'5uts2s7fl98clqz8uymaazehg'", f"'{match_id}'")
+    team_query = TEAM_QUERY.replace("'5uts2s7fl98clqz8uymaazehg'", f"'{match_id}'")
+    
+    team_ids_df = pd.read_sql_query(team_query, conn)
+    team_ids = team_ids_df['team_id'].tolist()
+    
+    if len(team_ids) < 2:
+        conn.close()
+        return None, None, None  # No data available for this match
+    
+    df_ball = pd.read_sql_query(ball_query, conn)
+    
+    # Update TEAM_QUERIES with the match_id
+    team_queries = TEAM_QUERIES.replace("'5uts2s7fl98clqz8uymaazehg'", f"'{match_id}'")
+    
+    df_home = pd.read_sql_query(team_queries, conn, params=(team_ids[0],))
+    df_away = pd.read_sql_query(team_queries, conn, params=(team_ids[1],))
+    
     conn.close()
     return df_ball, df_home, df_away
