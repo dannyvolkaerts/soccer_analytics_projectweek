@@ -151,6 +151,8 @@ erDiagram
     - A Match has many SpadlActions
     - A Player can perform many SpadlActions
     - A Team can perform many SpadlActions
+<<<<<<< HEAD
+=======
 
 
 <!-- a new table is added: player_position -->
@@ -175,3 +177,4 @@ The `player_position` table is used to:
 2. Support advanced analytics, such as heatmaps, pass networks or tactical evaluations.
 
 By storing the `position` as a standardized string (e.g., "GK", "DEF"), the table ensures consistency and facilitates querying and analysis.
+>>>>>>> upstream/main
