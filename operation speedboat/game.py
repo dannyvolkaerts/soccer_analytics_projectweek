@@ -19,7 +19,7 @@ class PygameWindow:
         
         self.running = True
         self.clock = pygame.time.Clock()
-        self.font = pygame.font.Font(None, 36)
+        self.font = pygame.font.Font(None, 22)
 
         # State variable to track if we are in the main menu, match view, or graph view
         self.view = "main"  # It can be "main", "graph", or "match"
@@ -95,11 +95,9 @@ class PygameWindow:
     #Idk why I said please in the comment below, Just know I am running on 1 brainncell
     def fetch_data_once(self, match_id):
         if match_id not in self.cached_data:
-            #remove None and uncomment this please
-            #match_events = fetch_match_events(match_id, self.connection)
-            #tracking_data = fetch_tracking_data(match_id, self.connection)
-            match_events = None
-            tracking_data = None
+            # remove None and uncomment this please
+            match_events = fetch_match_events(match_id, self.connection)
+            tracking_data = fetch_tracking_data(match_id, self.connection)
 
             self.cached_data[match_id] = {
                 'match_events': match_events,
@@ -138,8 +136,9 @@ class PygameWindow:
         button_y = (self.height - 100)
 
         # initial values for match buttons
-        vertical_spacing = 80
-        match_button_w = 500
+        match_button_h = 50
+        vertical_spacing = 75
+        match_button_w = 300
         match_pos_y = self.height // 2
         match_pos_x = (self.width - match_button_w) // 2
 
@@ -169,13 +168,13 @@ class PygameWindow:
                     match_string = f"{home_team} vs {away_team}"
 
                     # Calculate the vertical position for each match
-                    match_pos_y = 300 + i * vertical_spacing  # Adjust the y-position for each match 
+                    match_pos_y = 200 + i * vertical_spacing  # Adjust the y-position for each match 
 
                     # When a match button is clicked, show the match details
-                    self.draw_button(match_string, match_pos_x, match_pos_y, match_button_w, button_height, (168, 177, 241), (156, 166, 235), 
+                    self.draw_button(match_string, match_pos_x, match_pos_y, match_button_w, match_button_h, (168, 177, 241), (156, 166, 235), 
                                      lambda match_id=match_id, home_team=home_team, away_team=away_team: self.toggle_views(match_id, home_team, away_team, view_type="match"))
                     
-                    self.draw_button('graphs', graph_pos_x, match_pos_y, graph_button_w, button_height, (168, 177, 241), (156, 166, 235), 
+                    self.draw_button('graphs', graph_pos_x, match_pos_y, graph_button_w, match_button_h, (168, 177, 241), (156, 166, 235), 
                                      lambda match_id=match_id, home_team=home_team, away_team=away_team: self.toggle_views(match_id, home_team, away_team, view_type="graph"))
 
             # only shows when a graph is selected

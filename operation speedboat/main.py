@@ -1,7 +1,5 @@
 import random
 import pandas as pd
-import psycopg2
-import dotenv
 import os
 from game import PygameWindow
 from Python.helperfunctions import get_database_connection
@@ -52,42 +50,26 @@ Remeber for real: my advise for if you ever need to lock in: Hardstyle at 110% v
 """
 
 
-#conn = get_database_connection()
+conn = get_database_connection()
+
 #add query to get matches + team, something like this????
 query_matches = """
-SELECT * FROM matches m
+SELECT m.match_id, t_home.team_name AS home_team_name, t_away.team_name AS away_team_name
+FROM matches m
+JOIN teams t_home ON m.home_team_id = t_home.team_id
+JOIN teams t_away ON m.away_team_id = t_away.team_id
 """
 
-#remove campus
-#simulated data
-teams = [
-    "Club Brugge", "Anderlecht", "Genk", "Standard Liège", "Gent",
-    "Antwerp", "Charleroi", "Cercle Brugge", "Mechelen", "Eupen"
-]
-
-# Generate random matches
-data = {
-    "match_id": list(range(1, 6)),  # Match IDs 1-5
-    "home_team_id": random.sample(range(100, 200), 5),  # Random team IDs
-    "away_team_id": random.sample(range(200, 300), 5),  # Different random team IDs
-}
-
-# Assign random team names
-data["home_team_name"] = random.sample(teams, 5)
-data["away_team_name"] = random.sample(teams, 5)
-#till here
-
 # Create DataFrame
-matches_df = pd.DataFrame(data)
+matches_df = pd.read_sql_query(query_matches, conn)
 
 
 # Display DataFrame
 print(matches_df)
 
 if __name__ == "__main__":
-    game = PygameWindow(None, title="Maximized Pygame Window", fullscreen=False)
     #campus
-    #game = PygameWindow(conn, title="Maximized Pygame Window", fullscreen=False)
+    game = PygameWindow(conn, title="Maximized Pygame Window", fullscreen=False)
     game.run(matches_df)
 
 #CHECK HELPERFUNCTIONS AND ANIMATION TOOL
